@@ -1,13 +1,19 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { DaemonModule } from './daemon/daemon.module';
-import { ClientModule } from './client/client.module';
+
+// Module
 import { ScheduleModule } from '@nestjs/schedule';
 
+// Controller
+import { AppController } from './app.controller';
+
+// Service
+import { AppService } from './app.service';
+import { CryptoService } from './services/crypto.service';
+import { PeerService } from './services/peer.service';
+
 @Module({
-	imports: [ScheduleModule.forRoot(), DaemonModule, ClientModule],
+	imports: [ScheduleModule.forRoot()],
 	controllers: [AppController],
-	providers: [AppService],
+	providers: [AppService, CryptoService, PeerService],
 })
 export class AppModule {}

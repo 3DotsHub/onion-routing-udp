@@ -22,7 +22,7 @@ docker build --tag xxx:0.0.1 --no-cache .
 ### Create attachable swarm overlay network
 
 ```bash
-docker network create --driver overlay --attachable <name>
+docker network create --driver overlay --attachable --subnet=172.18.0.0/16 onion-routing-udp
 ```
 
 ### Develop application inside the container
@@ -30,15 +30,26 @@ docker network create --driver overlay --attachable <name>
 if you have docker desktop running, you can develop locally inside the container.
 
 ```bash
+# rsync local to master swarm node
+rsync -azP --delete . <user>@<host>:~/vol/onion-routing-udp/_data
+
+# goto app
 cd <to app directory>
+
+# run app with docker run from current app directory
 docker run -dit --rm --mount type=bind,source="$(pwd)",target=/data node bash -c "cd /data && npm run start:dev"
 docker run -it --rm --mount type=bind,source="$(pwd)",target=/data node bash -c "cd /data && npm run start:dev"
+
+# with network and static ip ??? breaks ???
+docker run -it --rm --mount type=bind,source="$(pwd)",target=/data --net onion-routing-udp --ip 172.18.0.2 node bash -c "cd /data && npm run start:dev"
+
 ```
 
 ## Installation
 
 ```bash
 $ npm install
+$ npm run build
 ```
 
 ## Protobuf

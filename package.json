@@ -31,8 +31,10 @@
 		"@nestjs/swagger": "^7.1.17",
 		"dgram": "^1.0.1",
 		"dotenv": "^16.4.5",
+		"ecpair": "^2.1.0",
 		"reflect-metadata": "^0.2.0",
-		"rxjs": "^7.8.1"
+		"rxjs": "^7.8.1",
+		"tiny-secp256k1": "^2.2.3"
 	},
 	"devDependencies": {
 		"@nestjs/cli": "^10.0.0",

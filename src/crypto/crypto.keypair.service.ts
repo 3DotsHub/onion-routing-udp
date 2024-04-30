@@ -6,7 +6,7 @@ import * as ecc from 'tiny-secp256k1';
 const ECPair = ECPairFactory(ecc);
 
 @Injectable()
-export class CryptoService {
+export class CryptoKeyPairService {
 	protected readonly identity = ECPair.makeRandom();
 
 	// getPrivateKey(): string {
@@ -40,5 +40,9 @@ export class CryptoService {
 		const signature = new Uint8Array(Buffer.from(pkg.signature, 'hex'));
 		const publicKey = new Uint8Array(Buffer.from(pkg.publicKey, 'hex'));
 		return ecc.verify(hashedMessage, publicKey, signature);
+	}
+
+	verifyPackageFromBuffer(pkg: Buffer): boolean {
+		return this.verifyPackage(Package.fromBinary(pkg));
 	}
 }

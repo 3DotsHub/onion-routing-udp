@@ -2,18 +2,12 @@ import { Module } from '@nestjs/common';
 
 // Module
 import { ScheduleModule } from '@nestjs/schedule';
-
-// Controller
-import { AppController } from './app.controller';
-
-// Service
-import { AppService } from './app.service';
-import { CryptoService } from './services/crypto.service';
-import { PeerService } from './services/peer.service';
+import { CryptoModule } from './crypto/crypto.module';
+import { PeerModule } from './peer/peer.module';
 
 @Module({
-	imports: [ScheduleModule.forRoot()],
-	controllers: [AppController],
-	providers: [AppService, CryptoService, PeerService],
+	imports: [ScheduleModule.forRoot(), CryptoModule, PeerModule],
+	controllers: [],
+	providers: [],
 })
 export class AppModule {}

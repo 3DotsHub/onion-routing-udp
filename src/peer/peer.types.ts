@@ -1,8 +1,4 @@
-export type Peer = {
-	pubkey?: string;
-	address: string;
-	port: number;
-};
+export type AddressInfo = { address: string; family: string; port: number };
 
 export type VerifiedPeer = {
 	pubkey?: string;

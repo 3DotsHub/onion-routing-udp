@@ -1,8 +1,8 @@
 import { AddressInfo } from './peer.types';
 
-export const bootstrapV0: AddressInfo[] = [
+export const bootstrapStatic: AddressInfo[] = [
 	{
-		address: '172.17.0.5',
+		address: '127.0.0.1',
 		family: 'IPv4',
 		port: 42069,
 	},
@@ -18,7 +18,7 @@ export const bootstrapV0: AddressInfo[] = [
 	},
 ];
 
-export function bootstrapMappingTo255(): AddressInfo[] {
+export function bootstrapMappingSubnet255(): AddressInfo[] {
 	const addressPrefix: string = '172.17.0.';
 	const family: string = 'IPv4';
 	const port: number = 42069;

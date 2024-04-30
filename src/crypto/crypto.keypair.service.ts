@@ -35,7 +35,7 @@ export class CryptoKeyPairService {
 		});
 	}
 
-	verifyPackage(pkg: Package): boolean {
+	verifyPackageSignature(pkg: Package): boolean {
 		const hashedMessage = new Uint8Array(Buffer.from(this.hashMessage(pkg.message), 'hex'));
 		const signature = new Uint8Array(Buffer.from(pkg.signature, 'hex'));
 		const publicKey = new Uint8Array(Buffer.from(pkg.publicKey, 'hex'));
@@ -43,6 +43,6 @@ export class CryptoKeyPairService {
 	}
 
 	verifyPackageFromBuffer(pkg: Buffer): boolean {
-		return this.verifyPackage(Package.fromBinary(pkg));
+		return this.verifyPackageSignature(Package.fromBinary(pkg));
 	}
 }

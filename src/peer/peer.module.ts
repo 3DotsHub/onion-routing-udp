@@ -2,18 +2,20 @@ import { Module } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
 import * as dgram from 'dgram';
 
-import { bootstrapStatic, bootstrapMappingSubnet255 } from './peer.config';
-import { AddressInfo, VerifiedPeer } from './peer.types';
 import { Package, Message, Op } from '../../protos/package';
+import { bootstrapStatic, bootstrapMappingSubnet255 } from 'src/peer/peer.config';
+import { AddressInfo, VerifiedPeer } from 'src/peer/peer.types';
+
+import { CryptoModule } from 'src/crypto/crypto.module';
+import { OpcodeModule } from 'src/opcode/opcode.module';
 
 import { CryptoKeyPairService } from 'src/crypto/crypto.keypair.service';
 import { PeerHandleService } from 'src/peer/peer.handle.service';
-import { CryptoModule } from 'src/crypto/crypto.module';
 
 @Module({
 	providers: [PeerHandleService],
 	exports: [PeerHandleService],
-	imports: [CryptoModule],
+	imports: [CryptoModule, OpcodeModule],
 })
 export class PeerModule {
 	private readonly socket: dgram.Socket = dgram.createSocket('udp4');
@@ -31,15 +33,13 @@ export class PeerModule {
 		this.socket.bind(this.port);
 	}
 
-	init() {}
-
 	@Interval(Math.floor(2000 * Math.random()))
 	sendDiscoveryMessage() {
 		// bootstrapping?
 		if (this.verifiedPeers.length == 0) {
 			const message = Message.create({ op: Op.DISCOVERY });
 			const signedPackage = this.cryptoKeyPairService.signMessage(message);
-			const addressInfos: AddressInfo[] = false ? bootstrapStatic : bootstrapMappingSubnet255();
+			const addressInfos: AddressInfo[] = true ? bootstrapStatic : bootstrapMappingSubnet255();
 			addressInfos.forEach((peer) => this.socket.send(Package.toBinary(signedPackage), peer.port, peer.address));
 		}
 	}

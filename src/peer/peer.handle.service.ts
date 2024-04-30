@@ -1,24 +1,24 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import * as dgram from 'dgram';
-import { Package, Message, Op } from '../../protos/package';
+import { Package } from '../../protos/package';
 import { AddressInfo } from 'src/peer/peer.types';
-import { CryptoKeyPairService } from 'src/crypto/crypto.keypair.service';
+import { OpcodeService } from 'src/opcode/opcode.service';
 
 @Injectable()
 export class PeerHandleService {
-	constructor(private readonly cryptoKeyPairService: CryptoKeyPairService) {}
+	private readonly logger = new Logger(this.constructor.name);
+	constructor(private readonly opcodeService: OpcodeService) {}
 
 	onErrorHandle(error: Error) {
-		console.error('Server error:', error);
+		this.logger.error('Server error:', error);
 	}
 
 	onListeningHandle(addressInfo: AddressInfo) {
-		console.log(`Socket listening on ${addressInfo.address}:${addressInfo.port}`);
+		this.logger.log(`Socket listening on ${addressInfo.address}:${addressInfo.port}`);
 	}
 
 	onMessageHandle(rdata: Buffer, rinfo: dgram.RemoteInfo) {
 		const pkg = Package.fromBinary(rdata);
-		const verified = this.cryptoKeyPairService.verifyPackage(pkg);
-		console.log(`Package received: ${rinfo.address}:${rinfo.port}, Verified: ${verified}, Opcode: ${pkg.message.op}`);
+		this.opcodeService.verifyOpcodeFromReceivedPackage(pkg, rinfo);
 	}
 }

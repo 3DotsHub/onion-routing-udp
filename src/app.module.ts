@@ -4,9 +4,10 @@ import { Module } from '@nestjs/common';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CryptoModule } from './crypto/crypto.module';
 import { PeerModule } from './peer/peer.module';
+import { OpcodeModule } from './opcode/opcode.module';
 
 @Module({
-	imports: [ScheduleModule.forRoot(), CryptoModule, PeerModule],
+	imports: [ScheduleModule.forRoot(), CryptoModule, PeerModule, OpcodeModule],
 	controllers: [],
 	providers: [],
 })

@@ -7,7 +7,7 @@ import { PeerModule } from './peer/peer.module';
 import { OpcodeModule } from './opcode/opcode.module';
 
 @Module({
-	imports: [ScheduleModule.forRoot(), CryptoModule, PeerModule, OpcodeModule],
+	imports: [ScheduleModule.forRoot(), CryptoModule, OpcodeModule, PeerModule],
 	controllers: [],
 	providers: [],
 })

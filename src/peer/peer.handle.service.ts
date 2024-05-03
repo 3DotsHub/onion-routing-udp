@@ -1,6 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as dgram from 'dgram';
-import { Package } from '../../protos/package';
 import { AddressInfo } from 'src/peer/peer.types';
 import { OpcodeService } from 'src/opcode/opcode.service';
 
@@ -17,8 +16,8 @@ export class PeerHandleService {
 		this.logger.log(`Socket listening on ${addressInfo.address}:${addressInfo.port}`);
 	}
 
-	onMessageHandle(rdata: Buffer, rinfo: dgram.RemoteInfo) {
-		const pkg = Package.fromBinary(rdata);
-		this.opcodeService.verifyOpcodeFromReceivedPackage(pkg, rinfo);
+	onMessageHandle(rdata: Buffer, rinfo: dgram.RemoteInfo, port: number) {
+		if (rinfo.port === port) return;
+		this.opcodeService.runFromBinary(rdata, rinfo);
 	}
 }

@@ -1,38 +1,42 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as dgram from 'dgram';
-import { Package, Message, Op } from '../../protos/package';
+import { SignedPackage, TransportData, OpTransport } from '../../protos/SignedPackage';
 
-import { CryptoKeyPairService } from 'src/crypto/crypto.keypair.service';
+import { CryptoRsaService } from 'src/crypto/crypto.rsa.service';
 import { OpcodeCreateService } from './opcode.create.service';
 import { OpcodeExecService } from './opcode.exec.service';
+import { PeerTransportService } from 'src/peer/peer.transport.service';
 
 @Injectable()
 export class OpcodeService {
 	private readonly logger = new Logger(this.constructor.name);
 
 	constructor(
-		private readonly cryptoKeyPairService: CryptoKeyPairService,
+		private readonly cryptoRsaService: CryptoRsaService,
 		private readonly opcodeCreateService: OpcodeCreateService,
 		private readonly opcodeExecService: OpcodeExecService
 	) {}
 
-	runFromBinary(rdata: Buffer, rinfo: dgram.RemoteInfo) {
-		const pkg = Package.fromBinary(rdata);
-		this.runFromReceivedPackage(pkg, rinfo);
+	runFromBinary(peerTransport: PeerTransportService, rdata: Buffer, rinfo: dgram.RemoteInfo) {
+		const pkg = SignedPackage.fromBinary(rdata);
+		this.runFromReceivedPackage(peerTransport, pkg, rinfo);
 	}
 
-	runFromReceivedPackage(pkg: Package, rinfo: dgram.RemoteInfo) {
+	runFromReceivedPackage(peerTransport: PeerTransportService, pkg: SignedPackage, rinfo: dgram.RemoteInfo) {
 		// verify package signature
-		const verified = this.cryptoKeyPairService.verifyPackageSignature(pkg);
+		const selfifed: boolean = this.cryptoRsaService.getPublicKey() === pkg.publicKey;
+		const verified: boolean = this.cryptoRsaService.verifyPackageSignature(pkg);
+		const opcodeTransport: OpTransport = pkg.transportData.opTransport;
 
 		// log income message
-		this.logger.log(`Package received: ${rinfo.address}:${rinfo.port}, Verified: ${verified}, Opcode: ${pkg.message.op}`);
+		this.logger.log(
+			`TransportPackage <>: ${rinfo.address}:${rinfo.port}, Verified: ${verified}, Selified: ${selfifed}, Opcode: ${opcodeTransport}`
+		);
 
 		// drop policy
-		if (!verified) return;
+		if (!verified || selfifed) return;
 
 		// redirect to service by opcode
-		const op: Op = pkg.message.op;
-		if (op === Op.DISCOVERY) this.opcodeExecService.execDiscoveryPackage(pkg, rinfo);
+		if (opcodeTransport === OpTransport.DISCOVERY) this.opcodeExecService.execDiscoveryPackage(pkg, rinfo);
 	}
 }

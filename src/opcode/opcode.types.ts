@@ -1,9 +1,9 @@
-import { Package } from 'protos/package';
+import { SignedPackage } from 'protos/SignedPackage';
 import { AddressInfo } from 'src/peer/peer.types';
 
 export type OpcodeCreateOutput = {
 	peer: AddressInfo;
-	pkg: Package;
+	pkg: SignedPackage;
 };
 
 export type OpcodeRunOutput = {};

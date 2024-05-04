@@ -2,13 +2,37 @@ import { Module } from '@nestjs/common';
 
 // Module
 import { ScheduleModule } from '@nestjs/schedule';
-import { CryptoModule } from './crypto/crypto.module';
-import { PeerModule } from './peer/peer.module';
-import { OpcodeModule } from './opcode/opcode.module';
+import { CryptoBitcoinService } from './crypto/crypto.bitcoin.service';
+import { CryptoRsaService } from './crypto/crypto.rsa.service';
+import { CryptoEncryptService } from './crypto/crypto.encrypt.service';
+import { PeerTransportService } from './peer/peer.transport.service';
+import { PeerHandleService } from './peer/peer.handle.service';
+import { OpcodeService } from './opcode/opcode.service';
+import { OpcodeCreateService } from './opcode/opcode.create.service';
+import { OpcodeExecService } from './opcode/opcode.exec.service';
 
 @Module({
-	imports: [ScheduleModule.forRoot(), CryptoModule, OpcodeModule, PeerModule],
+	providers: [
+		PeerTransportService,
+		PeerHandleService,
+		CryptoBitcoinService,
+		CryptoRsaService,
+		CryptoEncryptService,
+		OpcodeService,
+		OpcodeCreateService,
+		OpcodeExecService,
+	],
+	exports: [
+		PeerTransportService,
+		PeerHandleService,
+		CryptoBitcoinService,
+		CryptoRsaService,
+		CryptoEncryptService,
+		OpcodeService,
+		OpcodeCreateService,
+		OpcodeExecService,
+	],
+	imports: [ScheduleModule.forRoot()],
 	controllers: [],
-	providers: [],
 })
 export class AppModule {}

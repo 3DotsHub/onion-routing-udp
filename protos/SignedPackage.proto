@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+enum OpTransport {
+    DISCOVERY = 0;
+    ENCRYPTED = 1;
+}
+
+message SignedPackage {
+    TransportData transportData = 1;
+    string publicKey = 2;
+    string signature = 3;
+}
+
+message TransportData {
+    OpTransport opTransport = 1;
+    bytes message = 2;
+    string timeHash = 3;
+}

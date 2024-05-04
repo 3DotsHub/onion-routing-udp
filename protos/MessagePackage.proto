@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+enum OpMessage {
+    GETPEERS = 0;
+    ONION = 1;
+    FORWARD = 2;
+}
+
+message Message {
+    OpMessage opMessage = 1;
+    bytes data = 2;
+}

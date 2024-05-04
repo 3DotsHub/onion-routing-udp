@@ -1,15 +1,9 @@
 export type AddressInfo = { address: string; family: string; port: number };
 
 export type VerifiedPeer = {
-	pubkey?: string;
+	pubkey: string;
 	address: string;
 	port: number;
-	outputStats: {
-		discover: number;
-		updatedAt: Date;
-	};
-	inputStats: {
-		discover: number;
-		updatedAt: Date;
-	};
+	discoveredAt: number;
+	updatedAt: number;
 };

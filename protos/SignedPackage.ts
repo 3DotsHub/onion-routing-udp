@@ -36,13 +36,43 @@ export interface TransportData {
      */
     opTransport: OpTransport;
     /**
-     * @generated from protobuf field: bytes message = 2;
+     * @generated from protobuf field: bytes opData = 2;
      */
-    message: Uint8Array;
+    opData: Uint8Array;
     /**
      * @generated from protobuf field: string timeHash = 3;
      */
     timeHash: string;
+}
+/**
+ * @generated from protobuf message DiscoveryData
+ */
+export interface DiscoveryData {
+    /**
+     * @generated from protobuf field: repeated PeerIdentity PIds = 1 [json_name = "PIds"];
+     */
+    pIds: PeerIdentity[];
+}
+/**
+ * @generated from protobuf message PeerIdentity
+ */
+export interface PeerIdentity {
+    /**
+     * @generated from protobuf field: string ip = 1;
+     */
+    ip: string;
+    /**
+     * @generated from protobuf field: bytes port = 2;
+     */
+    port: Uint8Array;
+    /**
+     * @generated from protobuf field: string family = 3;
+     */
+    family: string;
+    /**
+     * @generated from protobuf field: bytes publicKey = 4;
+     */
+    publicKey: Uint8Array;
 }
 /**
  * @generated from protobuf enum OpTransport
@@ -124,14 +154,14 @@ class TransportData$Type extends MessageType<TransportData> {
     constructor() {
         super("TransportData", [
             { no: 1, name: "opTransport", kind: "enum", T: () => ["OpTransport", OpTransport] },
-            { no: 2, name: "message", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            { no: 2, name: "opData", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
             { no: 3, name: "timeHash", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<TransportData>): TransportData {
         const message = globalThis.Object.create((this.messagePrototype!));
         message.opTransport = 0;
-        message.message = new Uint8Array(0);
+        message.opData = new Uint8Array(0);
         message.timeHash = "";
         if (value !== undefined)
             reflectionMergePartial<TransportData>(this, message, value);
@@ -145,8 +175,8 @@ class TransportData$Type extends MessageType<TransportData> {
                 case /* OpTransport opTransport */ 1:
                     message.opTransport = reader.int32();
                     break;
-                case /* bytes message */ 2:
-                    message.message = reader.bytes();
+                case /* bytes opData */ 2:
+                    message.opData = reader.bytes();
                     break;
                 case /* string timeHash */ 3:
                     message.timeHash = reader.string();
@@ -166,9 +196,9 @@ class TransportData$Type extends MessageType<TransportData> {
         /* OpTransport opTransport = 1; */
         if (message.opTransport !== 0)
             writer.tag(1, WireType.Varint).int32(message.opTransport);
-        /* bytes message = 2; */
-        if (message.message.length)
-            writer.tag(2, WireType.LengthDelimited).bytes(message.message);
+        /* bytes opData = 2; */
+        if (message.opData.length)
+            writer.tag(2, WireType.LengthDelimited).bytes(message.opData);
         /* string timeHash = 3; */
         if (message.timeHash !== "")
             writer.tag(3, WireType.LengthDelimited).string(message.timeHash);
@@ -182,3 +212,121 @@ class TransportData$Type extends MessageType<TransportData> {
  * @generated MessageType for protobuf message TransportData
  */
 export const TransportData = new TransportData$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class DiscoveryData$Type extends MessageType<DiscoveryData> {
+    constructor() {
+        super("DiscoveryData", [
+            { no: 1, name: "PIds", kind: "message", jsonName: "PIds", repeat: 1 /*RepeatType.PACKED*/, T: () => PeerIdentity }
+        ]);
+    }
+    create(value?: PartialMessage<DiscoveryData>): DiscoveryData {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.pIds = [];
+        if (value !== undefined)
+            reflectionMergePartial<DiscoveryData>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DiscoveryData): DiscoveryData {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* repeated PeerIdentity PIds = 1 [json_name = "PIds"];*/ 1:
+                    message.pIds.push(PeerIdentity.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: DiscoveryData, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* repeated PeerIdentity PIds = 1 [json_name = "PIds"]; */
+        for (let i = 0; i < message.pIds.length; i++)
+            PeerIdentity.internalBinaryWrite(message.pIds[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message DiscoveryData
+ */
+export const DiscoveryData = new DiscoveryData$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class PeerIdentity$Type extends MessageType<PeerIdentity> {
+    constructor() {
+        super("PeerIdentity", [
+            { no: 1, name: "ip", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 2, name: "port", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            { no: 3, name: "family", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 4, name: "publicKey", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
+        ]);
+    }
+    create(value?: PartialMessage<PeerIdentity>): PeerIdentity {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.ip = "";
+        message.port = new Uint8Array(0);
+        message.family = "";
+        message.publicKey = new Uint8Array(0);
+        if (value !== undefined)
+            reflectionMergePartial<PeerIdentity>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PeerIdentity): PeerIdentity {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string ip */ 1:
+                    message.ip = reader.string();
+                    break;
+                case /* bytes port */ 2:
+                    message.port = reader.bytes();
+                    break;
+                case /* string family */ 3:
+                    message.family = reader.string();
+                    break;
+                case /* bytes publicKey */ 4:
+                    message.publicKey = reader.bytes();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: PeerIdentity, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* string ip = 1; */
+        if (message.ip !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.ip);
+        /* bytes port = 2; */
+        if (message.port.length)
+            writer.tag(2, WireType.LengthDelimited).bytes(message.port);
+        /* string family = 3; */
+        if (message.family !== "")
+            writer.tag(3, WireType.LengthDelimited).string(message.family);
+        /* bytes publicKey = 4; */
+        if (message.publicKey.length)
+            writer.tag(4, WireType.LengthDelimited).bytes(message.publicKey);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message PeerIdentity
+ */
+export const PeerIdentity = new PeerIdentity$Type();

@@ -52,6 +52,8 @@ Will prevent to sign packages, from the future. Past is still possible, because 
 | TransportOpcodeDiscoveryResponse | 2         | number  | Number of random peers to response with                    |
 | TransportOpcodeEncryptedDrop     | false     | boolean | Drop all transport packages addressing opcode ENCRYPTED    |
 
+--> see app.config.ts
+
 ## Transport Layer
 
 ### Types

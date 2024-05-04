@@ -12,7 +12,7 @@ export class OpcodeExecService {
 		const addr = rinfo.address;
 		const port = rinfo.port;
 
-		this.logger.log(`New peer discovery. ${pk} at ${addr}:${port}`);
+		this.logger.log(`New peer discovery. ${pk.slice(0, 32)} at ${addr}:${port}`);
 
 		// let found: boolean = false;
 		// for (let peer of this.peerTransportService.verifiedPeers) {

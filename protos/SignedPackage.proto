@@ -18,12 +18,9 @@ message TransportData {
 }
 
 message DiscoveryData {
-    repeated PeerIdentity PIds = 1;
+    bytes publicKey = 1;
 }
 
-message PeerIdentity {
-    string ip = 1;
-    bytes port = 2;
-    string family = 3;
-    bytes publicKey = 4;
+message EncryptedData {
+    bytes data = 1;
 }

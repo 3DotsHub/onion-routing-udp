@@ -7,7 +7,7 @@ import { Message } from '../../protos/MessagePackage';
 export class OpcodeExecService {
 	private readonly logger = new Logger(this.constructor.name);
 
-	execDiscoveryPackage(pkg: SignedPackage, rinfo: dgram.RemoteInfo) {
+	execTransportDiscovery(pkg: SignedPackage, rinfo: dgram.RemoteInfo) {
 		const pk = pkg.publicKey;
 		const addr = rinfo.address;
 		const port = rinfo.port;

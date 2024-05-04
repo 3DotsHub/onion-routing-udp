@@ -38,15 +38,11 @@ export class CryptoRsaService {
 		});
 	}
 
-	verifyPackageSignature(signedPackage: SignedPackage): boolean {
+	verifyPackageSignature(signedPackage: SignedPackage, publicKey: string): boolean {
 		const hashed = new Uint8Array(Buffer.from(this.hashTransportData(signedPackage.transportData), 'hex'));
 		return crypto
 			.createVerify('RSA-SHA256')
 			.update(hashed)
-			.verify(Buffer.from(signedPackage.publicKey, 'hex').toString('utf-8'), signedPackage.signature, 'hex');
-	}
-
-	verifyPackageFromBuffer(buf: Buffer): boolean {
-		return this.verifyPackageSignature(SignedPackage.fromBinary(buf));
+			.verify(Buffer.from(publicKey, 'hex').toString('utf-8'), signedPackage.signature, 'hex');
 	}
 }

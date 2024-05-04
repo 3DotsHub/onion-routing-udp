@@ -8,7 +8,7 @@ enum OpTransport {
     ENCRYPTED = 1;
 }
 
-message Package {
+message SignedPackage {
     TransportData transportData = 1;
     string publicKey = 2;
     string signature = 3;
@@ -16,7 +16,7 @@ message Package {
 
 message TransportData {
     OpTransport opTransport = 1;
-    bytes Message = 2;
+    bytes opData = 2;
     string timeHash = 3;
 }
 ```
@@ -25,13 +25,13 @@ message TransportData {
 
 #### SignedPackage
 
-SignedPackage acts as a wrapper to wrap the TransportData and attaches a signature to the TransportData and a publicKey. This should make sure that, noone is changing your transport packages. Verify: signature of sha256(message) from publicKey?
+SignedPackage acts as a wrapper to wrap the TransportData and attaches a signature to the TransportData and a publicKey. This should make sure that, noone is changing your transport packages. Verify: signature of sha256(transportData) from publicKey?
 
 #### TransportData
 
 Will include an transport package opcode for execution, message data and timeHash.
 
-#### Message
+#### OpData
 
 All relevant data, to run opcode.
 
@@ -67,7 +67,7 @@ type SignedPackage = {
 
 type TransportData = {
 	opTransport: OPCODE;
-	message: bytes;
+	opData: bytes;
 	timeHash: string;
 }
 ```

@@ -1,12 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as dgram from 'dgram';
-import { SignedPackage, TransportData, OpTransport } from '../../protos/SignedPackage';
+import { SignedPackage, TransportData, OpTransport, DiscoveryData, EncryptedData } from '../../protos/SignedPackage';
 
 import { CryptoRsaService } from 'src/crypto/crypto.rsa.service';
 import { OpcodeCreateService } from './opcode.create.service';
 import { OpcodeExecService } from './opcode.exec.service';
 import { PeerTransportService } from 'src/peer/peer.transport.service';
-import { SelfifyPublicKeyDrop, SignatureVerify } from 'src/app.config';
+import { SelfifyPublicKeyDrop, SignatureVerify, TransportOpcodeDiscoveryDrop, TransportOpcodeEncryptedDrop } from 'src/app.config';
+import { PeerIdentity, VerifiedPeer } from 'src/peer/peer.types';
 
 @Injectable()
 export class OpcodeTransportService {
@@ -24,24 +25,52 @@ export class OpcodeTransportService {
 	}
 
 	fromSignedPackage(peerTransport: PeerTransportService, pkg: SignedPackage, rinfo: dgram.RemoteInfo) {
-		const selfifed: boolean = this.cryptoRsaService.getPublicKey() === pkg.publicKey;
-		const verified: boolean = this.cryptoRsaService.verifyPackageSignature(pkg);
-		const opcodeTransport: OpTransport = pkg.transportData.opTransport;
-		const opcodeData: Uint8Array = pkg.transportData.opData;
+		const transportData: TransportData = pkg.transportData;
 
-		// drop policy
+		// if discovery, add identity first
+		if (transportData.opTransport === OpTransport.DISCOVERY) {
+			const discoveryData: DiscoveryData = DiscoveryData.fromBinary(transportData.opData);
+			const publicKey: string = Buffer.from(discoveryData.publicKey).toString('hex');
+			const selfifed: boolean = this.cryptoRsaService.getPublicKey() === publicKey;
+			const verified: boolean = this.cryptoRsaService.verifyPackageSignature(pkg, publicKey);
+
+			// verify policies
+			if (SignatureVerify && !verified) return;
+			if (SelfifyPublicKeyDrop && selfifed) return;
+
+			// upset to verified peers
+			peerTransport.upsetVerifiedPeers({
+				address: rinfo.address,
+				port: rinfo.port,
+				pubkey: publicKey,
+			});
+
+			this.logger.log(`TransportPackage <DISCOVERY>: ${rinfo.address}:${rinfo.port}, Verified: ${verified}, Selified: ${selfifed}`);
+		}
+
+		// getIdentity of transportData
+		const remoteIdentity: PeerIdentity = peerTransport.getIdentity(rinfo.address, rinfo.port);
+		if (!remoteIdentity) return;
+
+		// verify
+		const selfifed: boolean = this.cryptoRsaService.getPublicKey() === remoteIdentity.pubkey;
+		const verified: boolean = this.cryptoRsaService.verifyPackageSignature(pkg, remoteIdentity.pubkey);
+
+		// drop policies
 		if (SignatureVerify && !verified) return;
 		if (SelfifyPublicKeyDrop && selfifed) return;
 
-		this.logger.log(
-			`TransportPackage <${opcodeTransport}>: ${rinfo.address}:${rinfo.port}, Verified: ${verified}, Selified: ${selfifed}`
-		);
-
-		// redirect to service by opcode
-		if (opcodeTransport === OpTransport.DISCOVERY) {
-			this.opcodeExecService.execDiscoveryPackage(pkg, rinfo);
-		} else if (opcodeTransport === OpTransport.ENCRYPTED) {
-			// take opcodeData and decrypt with key. Which key?
+		// Opcode for transport
+		if (transportData.opTransport === OpTransport.DISCOVERY) {
+			if (TransportOpcodeDiscoveryDrop) return;
+			this.execOpTransportDiscovery(peerTransport, DiscoveryData.fromBinary(transportData.opData), rinfo);
+		} else if (transportData.opTransport === OpTransport.ENCRYPTED) {
+			if (TransportOpcodeEncryptedDrop) return;
+			this.execOpTransportEncrypted(peerTransport, EncryptedData.fromBinary(transportData.opData), rinfo);
 		}
 	}
+
+	execOpTransportDiscovery(peerTransport: PeerTransportService, discoveryData: DiscoveryData, rinfo: dgram.RemoteInfo) {}
+
+	execOpTransportEncrypted(peerTransport: PeerTransportService, encryptedData: EncryptedData, rinfo: dgram.RemoteInfo) {}
 }

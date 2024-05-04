@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as dgram from 'dgram';
-import { VerifiedPeer } from 'src/peer/peer.types';
+import { PeerIdentity, SignedPackageForTransport, VerifiedPeer } from 'src/peer/peer.types';
 import { PeerHandleService } from './peer.handle.service';
 import { Interval } from '@nestjs/schedule';
 import { OpcodeCreateService } from 'src/opcode/opcode.create.service';
@@ -9,6 +9,7 @@ import { OpcodeCreateOutput } from 'src/opcode/opcode.types';
 
 @Injectable()
 export class PeerTransportService {
+	private readonly logger = new Logger(this.constructor.name);
 	private readonly port: number = parseInt(process.env.LISTENPORT) || 42069;
 	public readonly socket: dgram.Socket = dgram.createSocket('udp4');
 	public readonly verifiedPeers: VerifiedPeer[] = [];
@@ -24,12 +25,42 @@ export class PeerTransportService {
 		this.socket.bind(this.port);
 	}
 
-	sendPackages(transportPkgs: OpcodeCreateOutput[]) {
+	sendPackages(transportPkgs: SignedPackageForTransport[]) {
 		transportPkgs.forEach((pkg) => this.socket.send(SignedPackage.toBinary(pkg.pkg), pkg.peer.port, pkg.peer.address));
 	}
 
 	@Interval(Math.floor(5000 + 10000 * Math.random()))
-	sendDiscoveryMessage() {
+	sendDiscoveryPackages() {
 		this.sendPackages(this.opcodeCreateService.createDiscoveryPackages(this.verifiedPeers));
+	}
+
+	getIdentity(addr: string, port: number): PeerIdentity {
+		for (let p of this.verifiedPeers) {
+			if (p.address === addr && p.port === port) return p;
+		}
+		return;
+	}
+
+	upsetVerifiedPeers(peerIdentity: PeerIdentity): boolean {
+		for (let p of this.verifiedPeers) {
+			const pId: PeerIdentity = {
+				address: p.address,
+				port: p.port,
+				pubkey: p.pubkey,
+			};
+			if (JSON.stringify(pId) === JSON.stringify(peerIdentity)) {
+				this.logger.log(`VerifiedPeer <UPDATE>: ${peerIdentity.address}:${peerIdentity.port}`);
+				p.updatedAt = Date.now();
+				return false;
+			}
+		}
+		this.verifiedPeers.push({
+			address: peerIdentity.address,
+			port: peerIdentity.port,
+			pubkey: peerIdentity.pubkey,
+			discoveredAt: Date.now(),
+			updatedAt: Date.now(),
+		});
+		this.logger.log(`VerifiedPeer <NEW>: ${peerIdentity.address}:${peerIdentity.port}`);
 	}
 }

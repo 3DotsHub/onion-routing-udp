@@ -81,4 +81,14 @@ export class PeerTransportService {
 		this.logger.log(`VerifiedPeer[${this.verifiedPeers.length}] <NEW PEER>: ${peerIdentity.address}:${peerIdentity.port}`);
 		return true;
 	}
+
+	@Interval(10 * 60 * 1000)
+	cleanVerifiedPeers() {
+		const now = Date.now();
+		for (let idx = 0; idx < this.verifiedPeers.length; idx++) {
+			if (this.verifiedPeers.at(idx).updatedAt + 60 * 1000 < now) {
+				this.verifiedPeers.splice(idx, 1);
+			}
+		}
+	}
 }

@@ -49,9 +49,8 @@ export class OpcodeTransportService {
 				pubKey: publicKey,
 			});
 
-			// upset to remoteIdentities
+			// // send discovery message to each remoteIdentities
 			discoveryData.remoteIdentities.map((i) => {
-				// send discovery message
 				peerTransport.sendPackages([this.opcodeCreateService.createDiscovery(i.address.toString(), parseInt(i.port.toString()))]);
 			});
 		}

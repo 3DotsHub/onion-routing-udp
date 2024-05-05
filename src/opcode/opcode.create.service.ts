@@ -23,7 +23,7 @@ export class OpcodeCreateService {
 
 	createDiscoveryPackages(verifiedPeers: VerifiedPeer[]): SignedPackageForTransport[] {
 		const numPeers: number = 5;
-		const numIdentities: number = 3;
+		const numIdentities: number = 5;
 		const randomPeers: PeerIdentity[] = [];
 		const randomIdentities: PeerIdentity[] = [];
 

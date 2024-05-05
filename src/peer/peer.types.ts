@@ -5,11 +5,11 @@ export type AddressInfo = { address: string; family?: string; port: number };
 export type PeerIdentity = {
 	address: string;
 	port: number;
-	pubkey: string;
+	pubKey: string;
 };
 
 export type VerifiedPeer = {
-	pubkey: string;
+	pubKey: string;
 	address: string;
 	port: number;
 	discoveredAt: number;

@@ -28,12 +28,10 @@ export class CryptoRsaService {
 	}
 
 	signTransportData(transportData: TransportData): SignedPackage {
-		const publicKey = this.getPublicKey();
 		const hashed = this.hashTransportData(transportData);
 		const signature = crypto.createSign('RSA-SHA256').update(Buffer.from(hashed, 'hex')).sign(this.identity.privateKey, 'hex');
 		return SignedPackage.create({
 			transportData,
-			publicKey,
 			signature,
 		});
 	}

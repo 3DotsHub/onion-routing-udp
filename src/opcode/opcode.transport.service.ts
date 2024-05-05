@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as dgram from 'dgram';
-import { SignedPackage, TransportData, OpTransport, DiscoveryData, EncryptedData } from '../../protos/SignedPackage';
+import { SignedPackage, TransportData, OpTransport, DiscoveryData, EncryptedData, RemoteIdentities } from '../../protos/SignedPackage';
+import { Message, OpMessage } from '../../protos/MessagePackage';
 
 import { CryptoRsaService } from 'src/crypto/crypto.rsa.service';
 import { OpcodeCreateService } from './opcode.create.service';
@@ -38,23 +39,38 @@ export class OpcodeTransportService {
 			if (SignatureVerify && !verified) return;
 			if (SelfifyPublicKeyDrop && selfifed) return;
 
+			// log
+			this.logger.log(
+				`TransportPackage[0] <DISCOVERY>: ${rinfo.address}:${rinfo.port}, Verified: ${verified}, Selified: ${selfifed}`
+			);
+
 			// upset to verified peers
 			peerTransport.upsetVerifiedPeers({
 				address: rinfo.address,
 				port: rinfo.port,
-				pubkey: publicKey,
+				pubKey: publicKey,
 			});
 
-			this.logger.log(`TransportPackage <DISCOVERY>: ${rinfo.address}:${rinfo.port}, Verified: ${verified}, Selified: ${selfifed}`);
+			// upset to remoteIdentities
+			discoveryData.remoteIdentities.map((i) =>
+				peerTransport.upsetVerifiedPeers({
+					address: i.address.toString(),
+					port: parseInt(i.port.toString()),
+					pubKey: Buffer.from(i.pubKey).toString('hex'),
+				})
+			);
 		}
 
 		// getIdentity of transportData
 		const remoteIdentity: PeerIdentity = peerTransport.getIdentity(rinfo.address, rinfo.port);
-		if (!remoteIdentity) return;
+		if (!remoteIdentity) {
+			peerTransport.sendPackages([this.opcodeCreateService.createDiscovery(rinfo.address, rinfo.port)]);
+			return; // could send a discovery packet
+		}
 
 		// verify
-		const selfifed: boolean = this.cryptoRsaService.getPublicKey() === remoteIdentity.pubkey;
-		const verified: boolean = this.cryptoRsaService.verifyPackageSignature(pkg, remoteIdentity.pubkey);
+		const selfifed: boolean = this.cryptoRsaService.getPublicKey() === remoteIdentity.pubKey;
+		const verified: boolean = this.cryptoRsaService.verifyPackageSignature(pkg, remoteIdentity.pubKey);
 
 		// drop policies
 		if (SignatureVerify && !verified) return;

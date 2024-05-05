@@ -42,7 +42,7 @@ export function bootstrapMappingSubnet255(): AddressInfo[] {
 	const start: number = 2;
 
 	const addr: AddressInfo[] = [];
-	for (let i = start; i < 256; i++) {
+	for (let i = start; i < 10; i++) {
 		addr.push({
 			address: `${addressPrefix}${i}`,
 			family,

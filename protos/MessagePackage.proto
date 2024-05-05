@@ -6,7 +6,7 @@ enum OpMessage {
     FORWARD = 2;
 }
 
-message Message {
+message MessagePackage {
     OpMessage opMessage = 1;
     bytes data = 2;
 }

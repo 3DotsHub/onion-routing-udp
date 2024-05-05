@@ -1,5 +1,5 @@
 {
-	"name": "dave-typescript",
+	"name": "onion-routing-udp",
 	"version": "0.0.1",
 	"description": "Research and Development: DHT on proof-of-work, cuckoo hashing and gossip over UDP.",
 	"author": "@samclassix, @3dotshub",
@@ -7,7 +7,7 @@
 	"license": "MIT",
 	"repository": {
 		"idea": "https://github.com/intob/dave",
-		"this": "https://github.com/3DotsHub/dave-typescript"
+		"this": "https://github.com/3DotsHub/onion-routing-udp"
 	},
 	"scripts": {
 		"build": "nest build",

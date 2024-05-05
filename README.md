@@ -43,6 +43,7 @@ docker run -it --rm --mount type=bind,source="$(pwd)",target=/data node bash -c 
 # with network and static ip ??? breaks ???
 docker run -it --rm --mount type=bind,source="$(pwd)",target=/data --net onion-routing-udp --ip 172.18.0.2 node bash -c "cd /data && npm run start:dev"
 
+docker service create --mount type=bind,source="$(pwd)",target=/data node bash -c "cd /data && npm run start:dev"
 ```
 
 ## Installation

@@ -26,19 +26,13 @@ export class CryptoBitcoinService {
 		const signature = this.identity.sign(Buffer.from(hashed, 'hex')).toString('hex');
 		return SignedPackage.create({
 			transportData,
-			publicKey,
 			signature,
 		});
 	}
 
-	verifyPackageSignature(signedPackage: SignedPackage): boolean {
+	verifyPackageSignature(signedPackage: SignedPackage, publicKey: string): boolean {
 		const hashedMessage = new Uint8Array(Buffer.from(this.hashTransportData(signedPackage.transportData), 'hex'));
 		const signature = new Uint8Array(Buffer.from(signedPackage.signature, 'hex'));
-		const publicKey = new Uint8Array(Buffer.from(signedPackage.publicKey, 'hex'));
-		return ecc.verify(hashedMessage, publicKey, signature);
-	}
-
-	verifyPackageFromBuffer(buf: Buffer): boolean {
-		return this.verifyPackageSignature(SignedPackage.fromBinary(buf));
+		return ecc.verify(hashedMessage, Buffer.from(publicKey, 'hex'), signature);
 	}
 }

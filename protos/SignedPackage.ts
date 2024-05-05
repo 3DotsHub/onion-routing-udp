@@ -19,10 +19,6 @@ export interface SignedPackage {
      */
     transportData?: TransportData;
     /**
-     * @generated from protobuf field: string publicKey = 2;
-     */
-    publicKey: string;
-    /**
      * @generated from protobuf field: string signature = 3;
      */
     signature: string;
@@ -52,6 +48,27 @@ export interface DiscoveryData {
      * @generated from protobuf field: bytes publicKey = 1;
      */
     publicKey: Uint8Array;
+    /**
+     * @generated from protobuf field: repeated RemoteIdentities remoteIdentities = 2;
+     */
+    remoteIdentities: RemoteIdentities[];
+}
+/**
+ * @generated from protobuf message RemoteIdentities
+ */
+export interface RemoteIdentities {
+    /**
+     * @generated from protobuf field: bytes address = 1;
+     */
+    address: Uint8Array;
+    /**
+     * @generated from protobuf field: bytes port = 2;
+     */
+    port: Uint8Array;
+    /**
+     * @generated from protobuf field: bytes pubKey = 3;
+     */
+    pubKey: Uint8Array;
 }
 /**
  * @generated from protobuf message EncryptedData
@@ -80,13 +97,11 @@ class SignedPackage$Type extends MessageType<SignedPackage> {
     constructor() {
         super("SignedPackage", [
             { no: 1, name: "transportData", kind: "message", T: () => TransportData },
-            { no: 2, name: "publicKey", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "signature", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<SignedPackage>): SignedPackage {
         const message = globalThis.Object.create((this.messagePrototype!));
-        message.publicKey = "";
         message.signature = "";
         if (value !== undefined)
             reflectionMergePartial<SignedPackage>(this, message, value);
@@ -99,9 +114,6 @@ class SignedPackage$Type extends MessageType<SignedPackage> {
             switch (fieldNo) {
                 case /* TransportData transportData */ 1:
                     message.transportData = TransportData.internalBinaryRead(reader, reader.uint32(), options, message.transportData);
-                    break;
-                case /* string publicKey */ 2:
-                    message.publicKey = reader.string();
                     break;
                 case /* string signature */ 3:
                     message.signature = reader.string();
@@ -121,9 +133,6 @@ class SignedPackage$Type extends MessageType<SignedPackage> {
         /* TransportData transportData = 1; */
         if (message.transportData)
             TransportData.internalBinaryWrite(message.transportData, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        /* string publicKey = 2; */
-        if (message.publicKey !== "")
-            writer.tag(2, WireType.LengthDelimited).string(message.publicKey);
         /* string signature = 3; */
         if (message.signature !== "")
             writer.tag(3, WireType.LengthDelimited).string(message.signature);
@@ -204,12 +213,14 @@ export const TransportData = new TransportData$Type();
 class DiscoveryData$Type extends MessageType<DiscoveryData> {
     constructor() {
         super("DiscoveryData", [
-            { no: 1, name: "publicKey", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
+            { no: 1, name: "publicKey", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            { no: 2, name: "remoteIdentities", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => RemoteIdentities }
         ]);
     }
     create(value?: PartialMessage<DiscoveryData>): DiscoveryData {
         const message = globalThis.Object.create((this.messagePrototype!));
         message.publicKey = new Uint8Array(0);
+        message.remoteIdentities = [];
         if (value !== undefined)
             reflectionMergePartial<DiscoveryData>(this, message, value);
         return message;
@@ -221,6 +232,9 @@ class DiscoveryData$Type extends MessageType<DiscoveryData> {
             switch (fieldNo) {
                 case /* bytes publicKey */ 1:
                     message.publicKey = reader.bytes();
+                    break;
+                case /* repeated RemoteIdentities remoteIdentities */ 2:
+                    message.remoteIdentities.push(RemoteIdentities.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -237,6 +251,9 @@ class DiscoveryData$Type extends MessageType<DiscoveryData> {
         /* bytes publicKey = 1; */
         if (message.publicKey.length)
             writer.tag(1, WireType.LengthDelimited).bytes(message.publicKey);
+        /* repeated RemoteIdentities remoteIdentities = 2; */
+        for (let i = 0; i < message.remoteIdentities.length; i++)
+            RemoteIdentities.internalBinaryWrite(message.remoteIdentities[i], writer.tag(2, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -247,6 +264,69 @@ class DiscoveryData$Type extends MessageType<DiscoveryData> {
  * @generated MessageType for protobuf message DiscoveryData
  */
 export const DiscoveryData = new DiscoveryData$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class RemoteIdentities$Type extends MessageType<RemoteIdentities> {
+    constructor() {
+        super("RemoteIdentities", [
+            { no: 1, name: "address", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            { no: 2, name: "port", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            { no: 3, name: "pubKey", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
+        ]);
+    }
+    create(value?: PartialMessage<RemoteIdentities>): RemoteIdentities {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.address = new Uint8Array(0);
+        message.port = new Uint8Array(0);
+        message.pubKey = new Uint8Array(0);
+        if (value !== undefined)
+            reflectionMergePartial<RemoteIdentities>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: RemoteIdentities): RemoteIdentities {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* bytes address */ 1:
+                    message.address = reader.bytes();
+                    break;
+                case /* bytes port */ 2:
+                    message.port = reader.bytes();
+                    break;
+                case /* bytes pubKey */ 3:
+                    message.pubKey = reader.bytes();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: RemoteIdentities, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* bytes address = 1; */
+        if (message.address.length)
+            writer.tag(1, WireType.LengthDelimited).bytes(message.address);
+        /* bytes port = 2; */
+        if (message.port.length)
+            writer.tag(2, WireType.LengthDelimited).bytes(message.port);
+        /* bytes pubKey = 3; */
+        if (message.pubKey.length)
+            writer.tag(3, WireType.LengthDelimited).bytes(message.pubKey);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message RemoteIdentities
+ */
+export const RemoteIdentities = new RemoteIdentities$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class EncryptedData$Type extends MessageType<EncryptedData> {
     constructor() {

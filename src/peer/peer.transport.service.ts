@@ -11,6 +11,7 @@ import { OpcodeCreateOutput } from 'src/opcode/opcode.types';
 export class PeerTransportService {
 	private readonly logger = new Logger(this.constructor.name);
 	private readonly port: number = parseInt(process.env.LISTENPORT) || 42069;
+	// private readonly port: number = 42069 + Math.floor(Math.random() * 1000);
 	public readonly socket: dgram.Socket = dgram.createSocket('udp4');
 	public readonly verifiedPeers: VerifiedPeer[] = [];
 
@@ -29,7 +30,7 @@ export class PeerTransportService {
 		transportPkgs.forEach((pkg) => this.socket.send(SignedPackage.toBinary(pkg.pkg), pkg.peer.port, pkg.peer.address));
 	}
 
-	@Interval(Math.floor(5000 + 10000 * Math.random()))
+	@Interval(Math.floor(10000 + 20000 * Math.random()))
 	sendDiscoveryPackages() {
 		this.sendPackages(this.opcodeCreateService.createDiscoveryPackages(this.verifiedPeers));
 	}
@@ -46,10 +47,10 @@ export class PeerTransportService {
 			const pId: PeerIdentity = {
 				address: p.address,
 				port: p.port,
-				pubkey: p.pubkey,
+				pubKey: p.pubKey,
 			};
 			if (JSON.stringify(pId) === JSON.stringify(peerIdentity)) {
-				this.logger.log(`VerifiedPeer <UPDATE>: ${peerIdentity.address}:${peerIdentity.port}`);
+				this.logger.log(`VerifiedPeer[${this.verifiedPeers.length}] <UPDATE>: ${peerIdentity.address}:${peerIdentity.port}`);
 				p.updatedAt = Date.now();
 				return false;
 			}
@@ -57,10 +58,10 @@ export class PeerTransportService {
 		this.verifiedPeers.push({
 			address: peerIdentity.address,
 			port: peerIdentity.port,
-			pubkey: peerIdentity.pubkey,
+			pubKey: peerIdentity.pubKey,
 			discoveredAt: Date.now(),
 			updatedAt: Date.now(),
 		});
-		this.logger.log(`VerifiedPeer <NEW>: ${peerIdentity.address}:${peerIdentity.port}`);
+		this.logger.log(`VerifiedPeer[${this.verifiedPeers.length}] <NEW>: ${peerIdentity.address}:${peerIdentity.port}`);
 	}
 }

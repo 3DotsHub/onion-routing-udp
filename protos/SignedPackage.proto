@@ -7,7 +7,6 @@ enum OpTransport {
 
 message SignedPackage {
     TransportData transportData = 1;
-    string publicKey = 2;
     string signature = 3;
 }
 
@@ -19,6 +18,13 @@ message TransportData {
 
 message DiscoveryData {
     bytes publicKey = 1;
+    repeated RemoteIdentities remoteIdentities = 2;
+}
+
+message RemoteIdentities {
+    bytes address = 1;
+    bytes port = 2;
+    bytes pubKey = 3;
 }
 
 message EncryptedData {

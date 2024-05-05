@@ -27,7 +27,10 @@ export class PeerTransportService {
 	}
 
 	sendPackages(transportPkgs: SignedPackageForTransport[]) {
-		transportPkgs.forEach((pkg) => this.socket.send(SignedPackage.toBinary(pkg.pkg), pkg.peer.port, pkg.peer.address));
+		transportPkgs.forEach((pkg) => {
+			this.logger.log(`Package[${pkg.pkg.transportData.opTransport}] <SEND TO>: ${pkg.peer.address}:${pkg.peer.port}`);
+			this.socket.send(SignedPackage.toBinary(pkg.pkg), pkg.peer.port, pkg.peer.address);
+		});
 	}
 
 	@Interval(Math.floor(10000 + 20000 * Math.random()))

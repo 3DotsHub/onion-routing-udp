@@ -1,22 +1,24 @@
 import { AddressInfo } from './peer.types';
 
-export const bootstrapStatic: AddressInfo[] = [
-	{
-		address: '127.0.0.1',
-		family: 'IPv4',
-		port: 42069,
-	},
-	{
-		address: '127.0.0.1',
-		family: 'IPv4',
-		port: 42070,
-	},
-	{
-		address: '127.0.0.1',
-		family: 'IPv4',
-		port: 42071,
-	},
-];
+export function bootstrapStatic(): AddressInfo[] {
+	return [
+		{
+			address: '188.68.59.23',
+			family: 'IPv4',
+			port: 42069,
+		},
+		{
+			address: '188.68.59.23',
+			family: 'IPv4',
+			port: 42070,
+		},
+		{
+			address: '188.68.59.23',
+			family: 'IPv4',
+			port: 42071,
+		},
+	];
+}
 
 export function bootstrapMappingLocalhostPorts(): AddressInfo[] {
 	const address: string = '127.0.0.1';

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { TransportData, OpTransport, DiscoveryData, RemoteIdentities } from '../../protos/SignedPackage';
 import { Message } from '../../protos/MessagePackage';
 
-import { bootstrapMappingLocalhostPorts, bootstrapMappingSubnet255 } from 'src/peer/peer.config';
+import { bootstrapMappingLocalhostPorts, bootstrapMappingSubnet255, bootstrapStatic } from 'src/peer/peer.config';
 import { AddressInfo, PeerIdentity, SignedPackageForTransport, VerifiedPeer } from 'src/peer/peer.types';
 import { CryptoRsaService } from 'src/crypto/crypto.rsa.service';
 import { read } from 'fs';
@@ -64,7 +64,7 @@ export class OpcodeCreateService {
 
 		// bootstrapping? over Transport Layer
 		if (verifiedPeers.length < 3) {
-			const addressInfos: AddressInfo[] = bootstrapMappingSubnet255();
+			const addressInfos: AddressInfo[] = bootstrapStatic();
 			const pkgs = addressInfos.map((peer: AddressInfo): SignedPackageForTransport => {
 				return {
 					peer,

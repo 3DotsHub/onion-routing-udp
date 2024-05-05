@@ -27,6 +27,8 @@ export class OpcodeTransportService {
 
 	fromSignedPackage(peerTransport: PeerTransportService, pkg: SignedPackage, rinfo: dgram.RemoteInfo) {
 		const transportData: TransportData = pkg.transportData;
+		const OpTnum: number = transportData.opTransport;
+		const OpTstr = Object.values(OpTransport).at(OpTnum);
 
 		// if discovery, add identity first
 		if (transportData.opTransport === OpTransport.DISCOVERY) {
@@ -40,7 +42,9 @@ export class OpcodeTransportService {
 			if (SelfifyPublicKeyDrop && selfifed) return;
 
 			// log
-			this.logger.log(`TransportPackage[0] <DISCOVERY>: ${rinfo.address}:${rinfo.port}, Verified: ${verified}`);
+			this.logger.log(
+				`TransportPackage[${OpTnum}] <${OpTstr}>: ${rinfo.address}:${rinfo.port} Verified: ${verified} Selfifed: ${selfifed}`
+			);
 
 			// upset to verified peers
 			peerTransport.upsetVerifiedPeers({
@@ -49,38 +53,39 @@ export class OpcodeTransportService {
 				pubKey: publicKey,
 			});
 
-			// // send discovery message to each remoteIdentities
+			// send discovery message to each remoteIdentities
 			discoveryData.remoteIdentities.map((i) => {
-				peerTransport.sendPackages([this.opcodeCreateService.createDiscovery(i.address.toString(), parseInt(i.port.toString()))]);
+				const remoteIdentity = peerTransport.getIdentity(i.address.toString(), parseInt(i.port.toString()));
+				// if not available
+				if (!remoteIdentity)
+					peerTransport.sendPackages([
+						this.opcodeCreateService.createDiscovery(i.address.toString(), parseInt(i.port.toString())),
+					]);
 			});
-		}
-
-		// getIdentity of transportData
-		const remoteIdentity: PeerIdentity = peerTransport.getIdentity(rinfo.address, rinfo.port);
-		if (!remoteIdentity) {
-			peerTransport.sendPackages([this.opcodeCreateService.createDiscovery(rinfo.address, rinfo.port)]);
-			return; // could send a discovery packet
-		}
-
-		// verify
-		const selfifed: boolean = this.cryptoRsaService.getPublicKey() === remoteIdentity.pubKey;
-		const verified: boolean = this.cryptoRsaService.verifyPackageSignature(pkg, remoteIdentity.pubKey);
-
-		// drop policies
-		if (SignatureVerify && !verified) return;
-		if (SelfifyPublicKeyDrop && selfifed) return;
-
-		// Opcode for transport
-		if (transportData.opTransport === OpTransport.DISCOVERY) {
-			if (TransportOpcodeDiscoveryDrop) return;
-			this.execOpTransportDiscovery(peerTransport, DiscoveryData.fromBinary(transportData.opData), rinfo);
 		} else if (transportData.opTransport === OpTransport.ENCRYPTED) {
-			if (TransportOpcodeEncryptedDrop) return;
-			this.execOpTransportEncrypted(peerTransport, EncryptedData.fromBinary(transportData.opData), rinfo);
+			// getIdentity of transportData
+			const remoteIdentity: PeerIdentity = peerTransport.getIdentity(rinfo.address, rinfo.port);
+			if (!remoteIdentity) {
+				peerTransport.sendPackages([this.opcodeCreateService.createDiscovery(rinfo.address, rinfo.port)]);
+				return; // could send a discovery packet
+			}
+
+			// verify
+			const selfifed: boolean = this.cryptoRsaService.getPublicKey() === remoteIdentity.pubKey;
+			const verified: boolean = this.cryptoRsaService.verifyPackageSignature(pkg, remoteIdentity.pubKey);
+
+			// drop policies
+			if (SignatureVerify && !verified) return;
+			if (SelfifyPublicKeyDrop && selfifed) return;
+
+			// log
+			this.logger.log(
+				`TransportPackage[${OpTnum}] <${OpTstr}>: ${rinfo.address}:${rinfo.port} Verified: ${verified} Selfifed: ${selfifed}`
+			);
+
+			// do something with encrypted data
+			const encryptedData: EncryptedData = EncryptedData.fromBinary(transportData.opData);
+			this.logger.log(`Encrypted data received: ${encryptedData.data}`);
 		}
 	}
-
-	execOpTransportDiscovery(peerTransport: PeerTransportService, discoveryData: DiscoveryData, rinfo: dgram.RemoteInfo) {}
-
-	execOpTransportEncrypted(peerTransport: PeerTransportService, encryptedData: EncryptedData, rinfo: dgram.RemoteInfo) {}
 }

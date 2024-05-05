@@ -41,6 +41,11 @@ docker run -dit --rm --mount type=bind,source="$(pwd)",target=/data node bash -c
 docker run -dit --rm --mount type=bind,source="$(pwd)",target=/data node bash -c "cd /data && npm run start:dev"
 docker run -it --rm --mount type=bind,source="$(pwd)",target=/data node bash -c "cd /data && npm run start:dev"
 
+# exporting host ports, watch firewall
+docker run -it --rm -v onion-routing-udp:/data -p 42069:42069/udp -e LISTENPORT=42069 node bash -c "cd /data && npm run start:dev"
+docker run -it --rm -v onion-routing-udp:/data -p 42070:42070/udp -e LISTENPORT=42070 node bash -c "cd /data && npm run start:dev"
+docker run -it --rm -v onion-routing-udp:/data -p 42071:42071/udp -e LISTENPORT=42071 node bash -c "cd /data && npm run start:dev"
+
 # with network and static ip ??? breaks ???
 docker run -it --rm --mount type=bind,source="$(pwd)",target=/data --net onion-routing-udp --ip 172.18.0.2 node bash -c "cd /data && npm run start:dev"
 

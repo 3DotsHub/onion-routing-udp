@@ -22,8 +22,8 @@ export class OpcodeCreateService {
 	}
 
 	createDiscoveryPackages(verifiedPeers: VerifiedPeer[]): SignedPackageForTransport[] {
-		const numPeers: number = 5;
-		const numIdentities: number = 5;
+		const numPeers: number = 10;
+		const numIdentities: number = 3;
 		const randomPeers: PeerIdentity[] = [];
 		const randomIdentities: PeerIdentity[] = [];
 
@@ -64,7 +64,14 @@ export class OpcodeCreateService {
 
 		// bootstrapping? over Transport Layer
 		if (verifiedPeers.length < 3) {
-			const addressInfos: AddressInfo[] = bootstrapStatic();
+			const verifiedPeersInfo: AddressInfo[] = verifiedPeers.map((p) => {
+				return { address: p.address, port: p.port, family: 'IPv4' };
+			});
+			const addressInfos: AddressInfo[] = verifiedPeersInfo.concat(
+				bootstrapStatic(),
+				bootstrapMappingLocalhostPorts(),
+				bootstrapMappingSubnet255()
+			);
 			const pkgs = addressInfos.map((peer: AddressInfo): SignedPackageForTransport => {
 				return {
 					peer,

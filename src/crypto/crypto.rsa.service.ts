@@ -12,7 +12,7 @@ export class CryptoRsaService {
 		this.generateNewIdentity();
 	}
 
-	@Interval(5 * 60 * 1000)
+	@Interval(10 * 60000)
 	generateNewIdentity() {
 		this.identity = crypto.generateKeyPairSync('rsa', {
 			modulusLength: 2048,

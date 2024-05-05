@@ -1,20 +1,32 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
+import { Interval } from '@nestjs/schedule';
 import * as crypto from 'crypto';
 import { SignedPackage, TransportData, OpTransport } from 'protos/SignedPackage';
 
 @Injectable()
 export class CryptoRsaService {
-	protected readonly identity = crypto.generateKeyPairSync('rsa', {
-		modulusLength: 2048,
-		publicKeyEncoding: {
-			type: 'spki',
-			format: 'pem',
-		},
-		privateKeyEncoding: {
-			type: 'pkcs8',
-			format: 'pem',
-		},
-	});
+	private readonly logger = new Logger(this.constructor.name);
+	protected identity = undefined;
+
+	constructor() {
+		this.generateNewIdentity();
+	}
+
+	@Interval(5 * 60 * 1000)
+	generateNewIdentity() {
+		this.identity = crypto.generateKeyPairSync('rsa', {
+			modulusLength: 2048,
+			publicKeyEncoding: {
+				type: 'spki',
+				format: 'pem',
+			},
+			privateKeyEncoding: {
+				type: 'pkcs8',
+				format: 'pem',
+			},
+		});
+		this.logger.log(`Generated new RSA Identity`);
+	}
 
 	getPublicKey(): string {
 		return Buffer.from(this.identity.publicKey).toString('hex');

@@ -40,9 +40,7 @@ export class OpcodeTransportService {
 			if (SelfifyPublicKeyDrop && selfifed) return;
 
 			// log
-			this.logger.log(
-				`TransportPackage[0] <DISCOVERY>: ${rinfo.address}:${rinfo.port}, Verified: ${verified}, Selified: ${selfifed}`
-			);
+			this.logger.log(`TransportPackage[0] <DISCOVERY>: ${rinfo.address}:${rinfo.port}, Verified: ${verified}`);
 
 			// upset to verified peers
 			peerTransport.upsetVerifiedPeers({
@@ -52,13 +50,10 @@ export class OpcodeTransportService {
 			});
 
 			// upset to remoteIdentities
-			discoveryData.remoteIdentities.map((i) =>
-				peerTransport.upsetVerifiedPeers({
-					address: i.address.toString(),
-					port: parseInt(i.port.toString()),
-					pubKey: Buffer.from(i.pubKey).toString('hex'),
-				})
-			);
+			discoveryData.remoteIdentities.map((i) => {
+				// send discovery message
+				peerTransport.sendPackages([this.opcodeCreateService.createDiscovery(i.address.toString(), parseInt(i.port.toString()))]);
+			});
 		}
 
 		// getIdentity of transportData

@@ -37,6 +37,7 @@ rsync -azP --delete . <user>@<host>:~/vol/onion-routing-udp/_data
 cd <to app directory>
 
 # run app with docker run from current app directory
+docker run -dit --rm --mount type=bind,source="$(pwd)",target=/data node bash -c "cd /data && npm run start"
 docker run -dit --rm --mount type=bind,source="$(pwd)",target=/data node bash -c "cd /data && npm run start:dev"
 docker run -it --rm --mount type=bind,source="$(pwd)",target=/data node bash -c "cd /data && npm run start:dev"
 

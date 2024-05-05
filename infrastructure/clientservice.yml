@@ -1,0 +1,19 @@
+version: '3.5'
+
+networks:
+    testnetpeers:
+        name: testnetpeers
+        external: true
+
+services:
+    peer:
+        image: node:18
+        volumes:
+            - app:/app
+        command: bash -c "cd /app && npm start"
+        environment:
+            - HIDDENSERVICE_PROFILE=alice
+            - HIDDENSERVICE_NAMESPACE=torreverseproxy
+            - HIDDENSERVICE_PORT=80
+        networks:
+            - torreverseproxy

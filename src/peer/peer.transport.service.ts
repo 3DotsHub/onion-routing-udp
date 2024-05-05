@@ -43,15 +43,30 @@ export class PeerTransportService {
 	}
 
 	upsetVerifiedPeers(peerIdentity: PeerIdentity): boolean {
+		// check all verified peers
 		for (let p of this.verifiedPeers) {
 			const pId: PeerIdentity = {
 				address: p.address,
 				port: p.port,
 				pubKey: p.pubKey,
 			};
-			if (JSON.stringify(pId) === JSON.stringify(peerIdentity)) {
-				this.logger.log(`VerifiedPeer[${this.verifiedPeers.length}] <UPDATE>: ${peerIdentity.address}:${peerIdentity.port}`);
+			if (peerIdentity.address === pId.address && peerIdentity.port === pId.port) {
+				// did pubKey changed?
+				if (peerIdentity.pubKey !== pId.pubKey) {
+					p.pubKey = peerIdentity.pubKey;
+					p.heartBeat = 0;
+					this.logger.log(
+						`VerifiedPeer[${this.verifiedPeers.length}] <UPDATE PUBKEY>: ${peerIdentity.address}:${peerIdentity.port}`
+					);
+				}
+
+				p.heartBeat += 1;
 				p.updatedAt = Date.now();
+
+				this.logger.log(
+					`VerifiedPeer[${this.verifiedPeers.length}] <UPDATE HEARTBEAT>: ${p.heartBeat} from ${peerIdentity.address}:${peerIdentity.port}`
+				);
+
 				return false;
 			}
 		}
@@ -59,9 +74,11 @@ export class PeerTransportService {
 			address: peerIdentity.address,
 			port: peerIdentity.port,
 			pubKey: peerIdentity.pubKey,
+			heartBeat: 0,
 			discoveredAt: Date.now(),
 			updatedAt: Date.now(),
 		});
-		this.logger.log(`VerifiedPeer[${this.verifiedPeers.length}] <NEW>: ${peerIdentity.address}:${peerIdentity.port}`);
+		this.logger.log(`VerifiedPeer[${this.verifiedPeers.length}] <NEW PEER>: ${peerIdentity.address}:${peerIdentity.port}`);
+		return true;
 	}
 }

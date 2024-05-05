@@ -12,6 +12,7 @@ export type VerifiedPeer = {
 	pubKey: string;
 	address: string;
 	port: number;
+	heartBeat: number;
 	discoveredAt: number;
 	updatedAt: number;
 };

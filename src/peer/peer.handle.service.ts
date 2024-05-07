@@ -15,7 +15,7 @@ export class PeerHandleService {
 
 	onListeningHandle(peerTransport: PeerTransportService) {
 		const addr: AddressInfo = peerTransport.socket.address();
-		this.logger.log(`Socket listening on ${addr.address}:${addr.port}`);
+		this.logger.warn(`Socket listening on ${addr.address}:${addr.port}`);
 	}
 
 	onMessageHandle(peerTransport: PeerTransportService, rdata: Buffer, rinfo: dgram.RemoteInfo) {

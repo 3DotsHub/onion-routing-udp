@@ -21,3 +21,8 @@ export type SignedPackageForTransport = {
 	peer: AddressInfo;
 	pkg: SignedPackage;
 };
+
+export class PeerTransportStats {
+	public sentPackagesCount: number = 0;
+	public receivedPackagesCount: number = 0;
+}

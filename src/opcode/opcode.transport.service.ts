@@ -41,6 +41,8 @@ export class OpcodeTransportService {
 			if (SignatureVerify && !verified) return;
 			if (SelfifyPublicKeyDrop && selfifed) return;
 
+			peerTransport.stats.receivedPackagesCount += 1;
+
 			// log
 			this.logger.log(
 				`TransportPackage[${OpTnum}] <${OpTstr}>: ${rinfo.address}:${rinfo.port} Verified: ${verified} Selfifed: ${selfifed}`
@@ -77,6 +79,8 @@ export class OpcodeTransportService {
 			// drop policies
 			if (SignatureVerify && !verified) return;
 			if (SelfifyPublicKeyDrop && selfifed) return;
+
+			peerTransport.stats.receivedPackagesCount += 1;
 
 			// log
 			this.logger.log(

@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as dgram from 'dgram';
-import { PeerIdentity, SignedPackageForTransport, VerifiedPeer } from 'src/peer/peer.types';
+import { PeerIdentity, PeerTransportStats, SignedPackageForTransport, VerifiedPeer } from 'src/peer/peer.types';
 import { PeerHandleService } from './peer.handle.service';
 import { Interval } from '@nestjs/schedule';
 import { OpcodeCreateService } from 'src/opcode/opcode.create.service';
@@ -14,6 +14,7 @@ export class PeerTransportService {
 	private readonly port: number = 42069 + Math.floor(Math.random() * 100);
 	public readonly socket: dgram.Socket = dgram.createSocket('udp4');
 	public readonly verifiedPeers: VerifiedPeer[] = [];
+	public readonly stats: PeerTransportStats = new PeerTransportStats();
 
 	constructor(
 		private readonly peerHandleService: PeerHandleService,
@@ -30,6 +31,7 @@ export class PeerTransportService {
 	sendPackages(transportPkgs: SignedPackageForTransport[]) {
 		transportPkgs.forEach((pkg) => {
 			// this.logger.log(`Package[${pkg.pkg.transportData.opTransport}] <SEND TO>: ${pkg.peer.address}:${pkg.peer.port}`);
+			this.stats.sentPackagesCount += 1;
 			this.socket.send(SignedPackage.toBinary(pkg.pkg), pkg.peer.port, pkg.peer.address);
 		});
 	}
@@ -62,7 +64,7 @@ export class PeerTransportService {
 				if (peerIdentity.pubKey !== pId.pubKey) {
 					p.pubKey = peerIdentity.pubKey;
 					p.heartBeat = 0;
-					this.logger.log(
+					this.logger.warn(
 						`VerifiedPeer[${this.verifiedPeers.length}] <UPDATE PUBKEY>: ${peerIdentity.address}:${peerIdentity.port}`
 					);
 				}
@@ -85,7 +87,7 @@ export class PeerTransportService {
 			discoveredAt: Date.now(),
 			updatedAt: Date.now(),
 		});
-		this.logger.log(`VerifiedPeer[${this.verifiedPeers.length}] <NEW PEER>: ${peerIdentity.address}:${peerIdentity.port}`);
+		this.logger.warn(`VerifiedPeer[${this.verifiedPeers.length}] <NEW PEER>: ${peerIdentity.address}:${peerIdentity.port}`);
 		return true;
 	}
 
@@ -100,11 +102,16 @@ export class PeerTransportService {
 				this.verifiedPeers.splice(idx, 1);
 				idx -= 1;
 
-				this.logger.log(
+				this.logger.error(
 					`VerifiedPeer[${this.verifiedPeers.length}] <DROP PEER>: ${peer.address}:${peer.port} HeartBeat: ${peer.heartBeat} Alive: ${alive}sec`
 				);
 			}
 		}
+	}
+
+	@Interval(10000)
+	showStats() {
+		this.logger.log(`PeerTransport <Stats>: Sent: ${this.stats.sentPackagesCount} Received: ${this.stats.receivedPackagesCount}`);
 	}
 
 	@Interval(10000 + Math.floor(50000 * Math.random()))

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { TransportData, OpTransport, DiscoveryData, RemoteIdentities } from '../../protos/SignedPackage';
 import { Message } from '../../protos/MessagePackage';
 
@@ -9,6 +9,7 @@ import { read } from 'fs';
 
 @Injectable()
 export class OpcodeCreateService {
+	private readonly logger = new Logger(this.constructor.name);
 	constructor(private readonly cryptoRsaService: CryptoRsaService) {}
 
 	createDiscovery(address: string, port: number): SignedPackageForTransport {
@@ -64,6 +65,7 @@ export class OpcodeCreateService {
 
 		// bootstrapping? over Transport Layer
 		if (verifiedPeers.length < 3) {
+			this.logger.warn(`Bootstrapping programm for peer discovery...`);
 			const verifiedPeersInfo: AddressInfo[] = verifiedPeers.map((p) => {
 				return { address: p.address, port: p.port, family: 'IPv4' };
 			});
